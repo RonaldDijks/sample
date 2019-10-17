@@ -2,4 +2,24 @@ node_modules
 __pycache__
 *.bak
 .ipynb_checkpoints
+.tox
 .DS_Store
+\#*#
+.#*
+.coverage
+.pytest_cache
+#src
+dist
+
+*.swp
+*.map
+.idea/
+Read the Docs
+config.rst
+*.iml
+/.project
+/.pydevproject
+
+package-lock.json
+geckodriver.log
+*.iml
