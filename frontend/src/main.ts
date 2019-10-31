@@ -1,24 +1,24 @@
 import { app, BrowserWindow } from "electron";
-import * as path from "path";
 
-let mainWindow: BrowserWindow | null;
-const url = path.join(__dirname, "..", "index.html");
-const isDevelopment = process.env.ELECTRON_DEV == "dev";
+let window: BrowserWindow | null;
 
 function createWindow(): void {
-  mainWindow = new BrowserWindow({
+  window = new BrowserWindow({
     height: 600,
-    width: 800
+    width: 800,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
-  mainWindow.loadFile(url);
+  window.loadFile("index.html");
 
-  if (isDevelopment) {
-    mainWindow.webContents.openDevTools();
+  if (process.env.ELECTRON_DEV == "dev") {
+    window.webContents.openDevTools();
   }
 
-  mainWindow.on("closed", () => {
-    mainWindow = null;
+  window.on("closed", () => {
+    window = null;
   });
 }
 
@@ -29,7 +29,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) {
+  if (window === null) {
     createWindow();
   }
 });
