@@ -8,6 +8,7 @@ __pycache__
 .#*
 .coverage
 .vscode
+.vskloot
 .pytest_cache
 #src
 dist

@@ -1,6 +1,16 @@
 import argparse
 import json
 from pathlib import Path
+import librosa
+from scipy.io import wavfile as wav
+import numpy as np
+
+def process(file):
+    path = file.resolve()
+    _, samplerate = librosa.load(path)
+
+    obj = { "path": str(path), "samplerate": samplerate }
+    print(json.dumps(obj))
     
 def main():
     parser = argparse.ArgumentParser()
@@ -13,11 +23,11 @@ def main():
     )
 
     args = parser.parse_args()
-    
-    files = [{ "path": str(x.resolve()) } for x in args.data_dir.glob("**/*.wav") if x.is_file()]
-    
-    print(json.dumps(files))
 
+    files = [x for x in args.data_dir.glob("**/*.wav") if x.is_file()]
+
+    for file in files:
+        process(file)
 
 if __name__ == "__main__":
     main()
