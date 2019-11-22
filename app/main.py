@@ -1,27 +1,35 @@
 import os
 import json
+import librosa
 import argparse
 from pathlib import Path
 
-# from JSON to Python
-x1 =  '{ "name":"John", "age":30, "city":"New York"}'
-y1 = json.loads(x1)
+defaultDataDir = Path(__file__).absolute().parent / "data"
 
-# from Python to JSON
-x2 = {
-  "name": "John",
-  "age": 30,
-  "city": "New York"
-}
-y2 = json.dumps(x2)
+def process(file):
+    path = file.resolve()
+    _, samplerate = librosa.load(path)
 
+    obj = { "path": str(path), "samplerate": samplerate }
+    print(json.dumps(obj))
+    
+def main():
+    parser = argparse.ArgumentParser()
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('integers', metavar='N', type=int, nargs='+',
-                    help='an integer for the accumulator')
-parser.add_argument('--sum', dest='accumulate', action='store_const',
-                    const=sum, default=max,
-                    help='sum the integers (default: find the max)')
+    parser.add_argument(
+        "--data_dir",
+        type=Path,
+        default=defaultDataDir,
+        help="Path to the data directory",
+        required=True
+    )
 
-args = parser.parse_args()
-print(args.accumulate(args.integers))
+    args = parser.parse_args()
+
+    files = [x for x in args.data_dir.glob("**/*.wav") if x.is_file()]
+
+    for file in files:
+        process(file)        
+   
+if __name__ == "__main__":
+    main()

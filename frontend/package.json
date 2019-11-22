@@ -8,6 +8,7 @@
     "start": "yarn build && electron ./dist/main.js"
   },
   "devDependencies": {
+    "@types/plotly.js": "^1.44.15",
     "@types/split2": "^2.1.6",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
@@ -23,6 +24,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "plotly.js": "^1.51.0",
     "split2": "^3.1.1"
   }
 }

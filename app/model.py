@@ -1,0 +1,23 @@
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Convolution2D, MaxPooling2D
+from keras.optimizers import Adam
+from keras.utils import np_utils
+from sklearn import metrics
+
+num_labels = yy.shape[1]
+filter_size = 2
+
+model = Sequential()
+
+model.add(Dense(256, input_shape=(40,)))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(num_labels))
+model.add(Activation('softmax'))
