@@ -6,18 +6,30 @@ from keras.optimizers import Adam
 from keras.utils import np_utils
 from sklearn import metrics
 
-num_labels = yy.shape[1]
+
+
+num_labels = 5
 filter_size = 2
 
-model = Sequential()
 
-model.add(Dense(256, input_shape=(40,)))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
+def create_model():
+    model = Sequential()
 
-model.add(Dense(256))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
+    model.add(Dense(256, input_shape=(40,)))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
 
-model.add(Dense(num_labels))
-model.add(Activation('softmax'))
+    model.add(Dense(256))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+
+    model.add(Dense(num_labels))
+    model.add(Activation('softmax'))
+
+    model.compile(
+        loss='categorical_crossentropy', 
+        metrics=['accuracy'], 
+        optimizer='adam'
+    )
+
+model.fit()

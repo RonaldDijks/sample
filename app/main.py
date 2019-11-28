@@ -4,7 +4,6 @@ import librosa
 import argparse
 from pathlib import Path
 
-defaultDataDir = Path(__file__).absolute().parent / "data"
 
 def process(file):
     path = file.resolve()
@@ -12,14 +11,15 @@ def process(file):
 
     obj = { "path": str(path), "samplerate": samplerate }
     print(json.dumps(obj))
-    
+
+
 def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
         "--data_dir",
         type=Path,
-        default=defaultDataDir,
+        default=Path(__file__).absolute().parent / "data",
         help="Path to the data directory",
         required=True
     )
@@ -30,6 +30,7 @@ def main():
 
     for file in files:
         process(file)        
+
    
 if __name__ == "__main__":
     main()
