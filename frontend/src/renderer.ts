@@ -15,7 +15,7 @@ Plotly.plot(
       x: x,
       y: y1,
       type: "scatter",
-      name: "Trial 1",
+      name: "Snares",
       mode: "markers",
       marker: { size: 16 }
     },
@@ -23,14 +23,18 @@ Plotly.plot(
       x: x,
       y: y2,
       type: "scatter",
-      name: "Trial 2",
+      name: "Kicks",
       mode: "markers",
       marker: { size: 16 }
     }
   ],
   {
+    autosize: true,
     hovermode: "closest",
-    title: 'Click "Go" button to trigger hover'
+    title: 'Sameness plot test 0.3'
+  },
+  {
+    autosizable: true
   }
 );
 
