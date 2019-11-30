@@ -34,13 +34,16 @@ def train_model(
     X_train, 
     y_train, 
     X_test, 
-    y_test, 
-    filepath,
+    y_test,
+    outdir,
+    checkpoint_filename,
+    model_filename,
+    model_weights_filename,
     num_epochs=100, 
     num_batch_size=32
 ):
     checkpointer = ModelCheckpoint(
-        filepath=filepath,
+        filepath=os.path.join(outdir, checkpoint_filename),
         save_best_only=True,
         verbose=0
     )
@@ -54,3 +57,10 @@ def train_model(
         callbacks=[checkpointer],
         verbose=0
     )
+
+    model_json = model.to_json()
+
+    with open(os.path.join(outdir, model_filename), "w") as json_file:
+        json_file.write(model_json)
+
+    model.save_weights(os.path.join(outdir, model_weights_filename))
