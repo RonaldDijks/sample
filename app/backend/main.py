@@ -95,7 +95,8 @@ def predict():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42)
 
-    print(model.evaluate(X_train, y_train, verbose=0))
+    score = model.evaluate(X_train, y_train, verbose=0)
+    print("%s: %.2f%%" % (model.metrics_names[1], score[1]*100))
 
     print("Finished loading weights.")
 
