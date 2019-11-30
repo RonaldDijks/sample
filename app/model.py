@@ -11,7 +11,6 @@ from sklearn import metrics
 num_labels = 5
 filter_size = 2
 
-
 def create_model():
     model = Sequential()
 
@@ -31,5 +30,3 @@ def create_model():
         metrics=['accuracy'], 
         optimizer='adam'
     )
-
-model.fit()

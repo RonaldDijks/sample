@@ -31,6 +31,6 @@ def main():
     for file in files:
         process(file)        
 
-   
+
 if __name__ == "__main__":
     main()
