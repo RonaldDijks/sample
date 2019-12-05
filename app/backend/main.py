@@ -1,13 +1,23 @@
 import pandas as pd
 import numpy as np
 import os
+import sys
+
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import logging
+logging.getLogger('tensorflow').disabled = True
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from keras.models import model_from_json
 from keras.utils import to_categorical
+sys.stderr = stderr
 
-from feature_extraction import extract_features
+from feature_extraction import extract_features, get_mfcc
 from model import create_model, train_model
 
 import argparse
@@ -16,6 +26,7 @@ outdir = os.path.join(os.getcwd(), "out")
 checkpoint_filename = "weights.best.basic_mlp.hdf5"
 model_filename = "model.json"
 model_weights_filename = "model.weights.hdf5"
+encoder_filename = 'classes.npy'
 
 def train():
 
@@ -29,6 +40,7 @@ def train():
 
     label_encoder = LabelEncoder()
     y = to_categorical(label_encoder.fit_transform(labels))
+    np.save(os.path.join(outdir, encoder_filename), label_encoder.classes_)
 
     print("Finished encoding labels.")
 
@@ -63,7 +75,10 @@ def train():
     print("Finished training model.")
 
 
-def predict():
+def predict(file):
+
+    label_encoder = LabelEncoder()
+    label_encoder.classes_ = np.load(os.path.join(outdir, encoder_filename))
 
     model_json_handle = open(os.path.join(outdir, model_filename), "r")
     model_json = model_json_handle.read()
@@ -79,36 +94,37 @@ def predict():
         optimizer='adam'    
     )
 
-    sample_csv = pd.read_csv("C:/dev/school/samples.csv")
-    features = extract_features(sample_csv)
+    file_path = os.path.join(os.getcwd(), file)
 
-    X = np.array(features.feature.tolist())
-    labels = np.array(features.label.tolist())
+    prediction_feature = np.array([get_mfcc(file_path)])
 
-    print("Finished extracting features.")
+    predicted_proba_vector = model.predict_proba(prediction_feature)
+    predicted_proba = predicted_proba_vector[0]
 
-    label_encoder = LabelEncoder()
-    y = to_categorical(label_encoder.fit_transform(labels))
+    result = {
+        'file_path': file_path,
+        'classes': {}
+    }
 
-    print("Finished encoding labels.")
+    for i in range(len(predicted_proba)):
+        category = label_encoder.inverse_transform(np.array([i]))
+        result['classes'][category[0]] = format(predicted_proba[i], '.32f')
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42)
+    print(result)
 
-    score = model.evaluate(X_train, y_train, verbose=0)
-    print("%s: %.2f%%" % (model.metrics_names[1], score[1]*100))
-
-    print("Finished loading weights.")
-
-commands = {
-    'train': train,
-    'predict': predict
-}
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('command', choices=commands.keys())
+subparsers = parser.add_subparsers(title='commands', dest='command', help='command')
+
+train_command = subparsers.add_parser('train', help='Train the neural network.')
+
+predict_command = subparsers.add_parser('predict', help='Predict the labels for a given sample.')
+predict_command.add_argument('file', action='store', help='The file to predict for.')
 
 args = parser.parse_args()
 
-commands[args.command]()
+if args.command == 'train':
+    train()
+elif args.command == 'predict':
+    predict(args.file)
