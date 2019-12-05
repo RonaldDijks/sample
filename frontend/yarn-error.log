@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\Sil\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add -D @types/plotly
+  C:\Program Files\nodejs\node.exe C:\Users\Sil\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @types/d3.chart
 
 PATH: 
   C:\Users\Sil\Anaconda3;C:\Users\Sil\Anaconda3\Library\mingw-w64\bin;C:\Users\Sil\Anaconda3\Library\usr\bin;C:\Users\Sil\Anaconda3\Library\bin;C:\Users\Sil\Anaconda3\Scripts;C:\Users\Sil\Anaconda3\bin;C:\Users\Sil\Anaconda3\condabin;C:\Rtools\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\ia32\compiler;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\HP\HP Performance Advisor;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files\Novell\iPrint;C:\Program Files\dotnet\;C:\Program Files\MATLAB\R2019a\bin;C:\Users\Sil\AppData\Local\Programs\Python\Python36\Scripts\;C:\Users\Sil\AppData\Local\Programs\Python\Python36\;C:\Users\Sil\AppData\Local\Microsoft\WindowsApps;C:\Users\Sil\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Sil\AppData\Roaming\npm;
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fplotly: Not found
+  Error: https://registry.yarnpkg.com/@types%2fd3.chart: Not found
       at Request.params.callback [as _callback] (C:\Users\Sil\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66926:18)
       at Request.self.callback (C:\Users\Sil\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140564:22)
       at Request.emit (events.js:189:13)
@@ -37,6 +37,7 @@ npm manifest:
       "start": "yarn build && electron ./dist/main.js"
     },
     "devDependencies": {
+      "@types/plotly.js": "^1.44.15",
       "@types/split2": "^2.1.6",
       "@typescript-eslint/eslint-plugin": "^2.4.0",
       "@typescript-eslint/parser": "^2.4.0",
@@ -52,7 +53,7 @@ npm manifest:
       "webpack-cli": "^3.3.10"
     },
     "dependencies": {
-      "plotly": "^1.0.6",
+      "d3.chart": "^0.3.0",
       "split2": "^3.1.1"
     }
   }
@@ -81,6 +82,11 @@ Lockfile:
       esutils "^2.0.2"
       js-tokens "^4.0.0"
   
+  "@types/d3@^3":
+    version "3.5.43"
+    resolved "https://registry.yarnpkg.com/@types/d3/-/d3-3.5.43.tgz#e9b4992817e0b6c5efaa7d6e5bb2cee4d73eab58"
+    integrity sha512-t9ZmXOcpVxywRw86YtIC54g7M9puRh8hFedRvVfHKf5YyOP6pSxA0TvpXpfseXSCInoW4P7bggTrSDiUOs4g5w==
+  
   "@types/eslint-visitor-keys@^1.0.0":
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -100,6 +106,13 @@ Lockfile:
     version "10.14.22"
     resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
     integrity sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==
+  
+  "@types/plotly.js@^1.44.15":
+    version "1.44.15"
+    resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.44.15.tgz#14d5f72fa1f08c57b1c84666ff5732cbf9b1b534"
+    integrity sha512-hsoML6JX6WnArYbol2xfqRxMPf7x9h7ZhgQ4Ni/jQqDXh+r3XhS0jjnWTsrU+DS2AK872xJ8YjU42KaLhYrmRg==
+    dependencies:
+      "@types/d3" "^3"
   
   "@types/split2@^2.1.6":
     version "2.1.6"
@@ -1053,6 +1066,11 @@ Lockfile:
     version "1.0.1"
     resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
     integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
+  
+  d3.chart@^0.3.0:
+    version "0.3.0"
+    resolved "https://registry.yarnpkg.com/d3.chart/-/d3.chart-0.3.0.tgz#8701e5662f0166ca8166e53ae834d4861ac08e8c"
+    integrity sha1-hwHlZi8BZsqBZuU66DTUhhrAjow=
   
   dashdash@^1.12.0:
     version "1.14.1"
@@ -2840,7 +2858,7 @@ Lockfile:
       for-in "^1.0.2"
       is-extendable "^1.0.1"
   
-  mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0:
+  mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1:
     version "0.5.1"
     resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
     integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
@@ -3367,13 +3385,6 @@ Lockfile:
     integrity sha512-/E57AYkoeQ25qkxMj5PBOVgF8Kiu/h7cYS30Z5+R7WaiCCBfLq58ZI/dSeaEKb9WVJV5n/03QwrN3IeWIFllvw==
     dependencies:
       find-up "^3.0.0"
-  
-  plotly@^1.0.6:
-    version "1.0.6"
-    resolved "https://registry.yarnpkg.com/plotly/-/plotly-1.0.6.tgz#b2672c3df88333625bdf684982d0e3f6521d7aaa"
-    integrity sha1-smcsPfiDM2Jb32hJgtDj9lIdeqo=
-    dependencies:
-      mkdirp "~0.5.0"
   
   posix-character-classes@^0.1.0:
     version "0.1.1"

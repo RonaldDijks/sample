@@ -24,7 +24,8 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "plotly.js": "^1.51.0",
+    "@types/d3": "^5.7.2",
+    "d3": "^5.14.2",
     "split2": "^3.1.1"
   }
 }
