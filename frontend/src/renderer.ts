@@ -2,7 +2,7 @@ import * as d3 from "d3";
 
 import { spawn } from "child_process";
 import split from "split2";
-import { getLabels } from './core/backend'
+import { getLabels, predict } from './core/backend'
 
 interface Vector2 {
   x: number;
@@ -28,7 +28,7 @@ const main = async () => {
   // Add X axis
   const x = d3
     .scaleLinear()
-    .domain([0, 1])
+    .domain([-1, 1])
     .range([0, width]);
   svg
     .append("g")
@@ -38,7 +38,7 @@ const main = async () => {
   // Add Y axis
   const y = d3
     .scaleLinear()
-    .domain([0, 1])
+    .domain([-1, 1])
     .range([height, 0]);
   svg.append("g").call(d3.axisLeft(y));
 
@@ -81,9 +81,9 @@ const main = async () => {
     };
   }
 
-  const mousemove: d3.ValueFn<SVGCircleElement, Node, void> = function(d: any) {
+  const mousemove: d3.ValueFn<SVGCircleElement, any, void> = function(d: any) {
     tooltip
-      .html("The exact value of<br>the Ground Living area is: " + d.GrLivArea)
+      .html(d.summary)
       .style("left", d3.mouse(this)[0] + 90 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
       .style("top", d3.mouse(this)[1] + "px");
   };
@@ -104,8 +104,8 @@ const main = async () => {
   }
 
   const offset = Math.PI * 2 / labels.length;
-  const radius = 0.4;
-  const center: Vector2 = {x: 0.5, y: 0.5}
+  const radius = 1.0;
+  const center: Vector2 = {x: 0, y: 0}
   const label_coordinates: LabelDataPoint[] = [];
   
   for (let i = 0; i < labels.length; i++) {
@@ -118,6 +118,8 @@ const main = async () => {
       name: label
     })
   }
+
+  console.log(label_coordinates)
 
   const div = d3.select("body").append("div")	
     .attr("class", "tooltip")				
@@ -147,6 +149,44 @@ const main = async () => {
           .duration(500)		
           .style("opacity", 0);	
   });
+
+
+  const predictResult = await predict();
+  const predictClassesArray = Object.entries(predictResult.classes);
+
+  const location: Vector2 = { x: 0, y: 0 }
+
+  for (let i = 0; i < label_coordinates.length; i++) {
+    const label = label_coordinates[i];
+    const [_, sameness] = predictClassesArray.find(([l, _]) => label.name === l)!
+    location.x += label.coordinate.x * sameness;
+    location.y += label.coordinate.y * sameness;
+  }
+
+  console.log(location)
+
+    svg
+      .append("g")
+      .selectAll("dot")
+      //.data(data.filter(function(d: any, i: any){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
+      .data([{
+        file_name: predictResult.file_name,
+        location: location,
+        // summary: labelsArray.map(([label, sameness]) => `${label}: ${sameness}`).join("\n")
+      }])
+      .enter()
+      .append("circle")
+      .attr("cx", d => x(d.location.x))
+      .attr("cy", d => y(d.location.y))
+      .attr("r", 7)
+      .style("fill", "#69b3a2")
+      .style("opacity", 0.3)
+      .style("stroke", "white")
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseleave", mouseleave);
+
+  
 
   // const result = spawn("python", [
   //   "..\\app\\backend\\main.py",
