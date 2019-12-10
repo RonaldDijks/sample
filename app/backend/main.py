@@ -82,6 +82,7 @@ def predict(file):
     label_encoder.classes_ = np.load(os.path.join(outdir, encoder_filename))
 
     model_json_handle = open(os.path.join(outdir, model_filename), "r")
+
     model_json = model_json_handle.read()
     model_json_handle.close()
 
@@ -113,6 +114,10 @@ def predict(file):
 
     print(json.dumps(result))
 
+def labels():
+    classes = np.load(os.path.join(outdir, encoder_filename))
+    classes_json = json.dumps(classes.tolist())
+    print(classes_json)
 
 parser = argparse.ArgumentParser()
 
@@ -123,9 +128,13 @@ train_command = subparsers.add_parser('train', help='Train the neural network.')
 predict_command = subparsers.add_parser('predict', help='Predict the labels for a given sample.')
 predict_command.add_argument('file', action='store', help='The file to predict for.')
 
+label_command = subparsers.add_parser('labels', help="Return all the network's labels.")
+
 args = parser.parse_args()
 
 if args.command == 'train':
     train()
 elif args.command == 'predict':
     predict(args.file)
+elif args.command == 'labels':
+    labels()
