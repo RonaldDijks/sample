@@ -3,6 +3,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = [
   {
+    resolve: {
+      extensions: [".ts", ".tsx", ".js", ".json"]
+    },
     mode: "development",
     entry: "./src/main.ts",
     target: "electron-main",
@@ -21,6 +24,9 @@ module.exports = [
     }
   },
   {
+    resolve: {
+      extensions: [".ts", ".tsx", ".js", ".json"]
+    },
     mode: "development",
     entry: "./src/renderer.ts",
     target: "electron-renderer",
@@ -43,5 +49,5 @@ module.exports = [
         template: "./src/index.html"
       })
     ]
-  }
+  },
 ];

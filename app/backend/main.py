@@ -4,8 +4,8 @@ import os
 import sys
 import json
 
-# stderr = sys.stderr
-# sys.stderr = open(os.devnull, 'w')
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -16,7 +16,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from keras.models import model_from_json
 from keras.utils import to_categorical
-# sys.stderr = stderr
+sys.stderr = stderr
 
 from feature_extraction import extract_features, get_mfcc
 from model import create_model, train_model
