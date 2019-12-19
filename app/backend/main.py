@@ -112,7 +112,22 @@ def predict(file):
         category = label_encoder.inverse_transform(np.array([i]))
         result['classes'][category[0]] = format(predicted_proba[i], '.32f')
 
-    print(json.dumps(result))
+    return result
+
+def predict_many(files):
+    output = []
+    
+    for file in files:
+        output.append(predict(file))
+
+    return output
+
+def predict_folder(path):
+    files = os.listdir(path)
+    files = map(lambda x: os.path.join(path, x), files)
+    files = filter(lambda x: x.endswith(".wav"), files)
+    files = list(files)
+    return predict_many(files)
 
 def labels():
     classes = np.load(os.path.join(outdir, encoder_filename))
@@ -128,6 +143,12 @@ train_command = subparsers.add_parser('train', help='Train the neural network.')
 predict_command = subparsers.add_parser('predict', help='Predict the labels for a given sample.')
 predict_command.add_argument('file', action='store', help='The file to predict for.')
 
+predict_many_command = subparsers.add_parser('predict_many', help="Predict for all given samples.")
+predict_many_command.add_argument('files', nargs='+', action='store', help='A list of files to predict for.')
+
+predict_folder_command = subparsers.add_parser('predict_folder', help="Predict for all given samples.")
+predict_folder_command.add_argument('folder', action='store', help='A list of files to predict for.')
+
 label_command = subparsers.add_parser('labels', help="Return all the network's labels.")
 
 args = parser.parse_args()
@@ -135,6 +156,10 @@ args = parser.parse_args()
 if args.command == 'train':
     train()
 elif args.command == 'predict':
-    predict(args.file)
+    print(json.dumps(predict(args.file)))
+elif args.command == 'predict_many':
+    print(json.dumps(predict_many(args.files)))
+elif args.command == 'predict_folder':
+    print(json.dumps(predict_folder(args.folder)))
 elif args.command == 'labels':
     labels()

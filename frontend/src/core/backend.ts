@@ -10,14 +10,12 @@ export const getLabels = () =>
     });
   });
 
-
 interface PredictResult {
-    file_name: string,
-    classes: {
-        [label: string]: number
-    }
+  file_name: string;
+  classes: {
+    [label: string]: number;
+  };
 }
-
 
 // const result = spawn("python", [
 //     "..\\app\\backend\\main.py",
@@ -25,15 +23,15 @@ interface PredictResult {
 //     "..\\app\\backend\\snare.wav"
 //   ]);
 
-export const predict = (filepath: string = "..\\app\\backend\\snare.wav") => 
+export const predict = (filepath: string = "..\\app\\backend\\snare.wav") =>
   new Promise<PredictResult>((resolve, reject) => {
     const process = spawn("python", [
-        "..\\app\\backend\\main.py",
-        "predict",
-        filepath
-      ]);
-    
-      process.stdout.pipe(split(JSON.parse)).on('data', data => {
-          resolve(data)
-      })
-  })
+      "..\\app\\backend\\main.py",
+      "predict",
+      filepath
+    ]);
+
+    process.stdout.pipe(split(JSON.parse)).on("data", data => {
+      resolve(data);
+    });
+  });
