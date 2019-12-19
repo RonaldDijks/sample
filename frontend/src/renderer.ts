@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 
+import electron from 'electron'
 import { spawn } from "child_process";
 import split from "split2";
 import { getLabels, predict } from './core/backend'
@@ -8,6 +9,13 @@ interface Vector2 {
   x: number;
   y: number;
 }
+
+const openFolderButton = document.getElementById('open-folder')! as HTMLButtonElement
+openFolderButton.onclick = async () => {
+  const files = await electron.ipcRenderer.invoke('open-folder')
+  
+}
+
 
 const main = async () => {
   const margin = { top: 10, right: 30, bottom: 30, left: 60 },
