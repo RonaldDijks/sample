@@ -28,7 +28,7 @@ module.exports = [
       extensions: [".ts", ".tsx", ".js", ".json"]
     },
     mode: "development",
-    entry: "./src/renderer.ts",
+    entry: "./src/renderer.tsx",
     target: "electron-renderer",
     devtool: "source-map",
     module: {

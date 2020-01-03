@@ -11,16 +11,16 @@ interface Vector2 {
 }
 
 const openFolderButton = document.getElementById('open-folder')! as HTMLButtonElement
+
 openFolderButton.onclick = async () => {
   const files = await electron.ipcRenderer.invoke('open-folder')
-  
 }
 
 
 const main = async () => {
-  const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-    width = 700 - margin.left - margin.right,
-    height = 700 - margin.top - margin.bottom;
+  const margin = { top: 10, right: 30, bottom: 30, left: 60 };
+  const width = 700 - margin.left - margin.right;
+  const height = 700 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
   const svg = d3
@@ -38,6 +38,7 @@ const main = async () => {
     .scaleLinear()
     .domain([-1, 1])
     .range([0, width]);
+    
   svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
