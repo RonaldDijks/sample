@@ -23,7 +23,7 @@ interface PredictResult {
 //     "..\\app\\backend\\snare.wav"
 //   ]);
 
-export const predict = (filepath: string = "..\\app\\backend\\snare.wav") =>
+export const predict = (filepath: string = "..\\app\\backend\\kick.wav") =>
   new Promise<PredictResult>((resolve, reject) => {
     const process = spawn("python", [
       "..\\app\\backend\\main.py",
