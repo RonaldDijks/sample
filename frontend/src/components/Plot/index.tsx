@@ -2,13 +2,18 @@ import * as d3 from "d3";
 import React, { useEffect, useRef } from "react";
 
 import { getLabels, predict } from "../../core/backend";
+import { PredictResult } from "src/core/types";
 
 interface Vector2 {
   x: number;
   y: number;
 }
 
-export const Plot = () => {
+interface PlotProps {
+  files: PredictResult[]
+}
+
+export const Plot: React.FC<PlotProps> = ({ files }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -158,33 +163,34 @@ export const Plot = () => {
             .style("opacity", 0);
         });
 
-      const predictResult = await predict();
-      const predictClassesArray = Object.entries(predictResult.classes);
+      // const predictResult = await predict();
 
-      const location: Vector2 = { x: 0, y: 0 };
+      const data = files.map(({classes, file_name}) => {
+        const predictClassesArray = Object.entries(classes);
 
-      for (let i = 0; i < label_coordinates.length; i++) {
-        const label = label_coordinates[i];
-        const [_, sameness] = predictClassesArray.find(
-          ([l, _]) => label.name === l
-        )!;
-        location.x += label.coordinate.x * sameness;
-        location.y += label.coordinate.y * sameness;
-      }
+        const location: Vector2 = { x: 0, y: 0 };
+  
+        for (let i = 0; i < label_coordinates.length; i++) {
+          const label = label_coordinates[i];
+          const [_, sameness] = predictClassesArray.find(
+            ([l, _]) => label.name === l
+          )!;
+          location.x += label.coordinate.x * sameness;
+          location.y += label.coordinate.y * sameness;
+        }
 
-      console.log(location);
+        return {
+          location,
+          file_name
+        }
+      })
+
 
       svg
         .append("g")
         .selectAll("dot")
         //.data(data.filter(function(d: any, i: any){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
-        .data([
-          {
-            file_name: predictResult.file_name,
-            location: location
-            // summary: labelsArray.map(([label, sameness]) => `${label}: ${sameness}`).join("\n")
-          }
-        ])
+        .data(data)
         .enter()
         .append("circle")
         .attr("cx", d => x(d.location.x))
