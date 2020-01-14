@@ -1,5 +1,5 @@
 export interface PredictResult {
-  file_name: string;
+  file_path: string;
   classes: {
     [label: string]: number;
   };

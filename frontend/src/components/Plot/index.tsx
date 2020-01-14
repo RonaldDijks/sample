@@ -1,210 +1,155 @@
-import * as d3 from "d3";
-import React, { useEffect, useRef } from "react";
-
-import { getLabels, predict } from "../../core/backend";
-import { PredictResult } from "src/core/types";
+import React, { useRef, useEffect } from "react";
+import { PredictResult } from "../../core/types";
+import { getLabels } from "../../core/backend";
 
 interface Vector2 {
   x: number;
   y: number;
 }
 
-interface PlotProps {
-  files: PredictResult[]
+interface LabelDataPoint {
+  coordinate: Vector2;
+  name: string;
 }
 
-export const Plot: React.FC<PlotProps> = ({ files }) => {
-  const ref = useRef<HTMLDivElement>(null);
+export interface PlotProps {
+  files: PredictResult[];
+  width: number;
+  height: number;
+}
+
+const getComponents = (labels: string[]): LabelDataPoint[] => {
+  const offset = (Math.PI * 2) / labels.length;
+  const radius = 0.9;
+  const center: Vector2 = { x: 0, y: 0 };
+  const label_coordinates: LabelDataPoint[] = [];
+
+  for (let i = 0; i < labels.length; i++) {
+    const label = labels[i];
+    const angle = i * offset;
+    const x = center.x + radius * Math.cos(angle);
+    const y = center.y + radius * Math.sin(angle);
+    label_coordinates.push({
+      coordinate: { x, y },
+      name: label
+    });
+  }
+
+  return label_coordinates;
+};
+
+interface Drawable {
+  name: string;
+  position: Vector2;
+  radius: number;
+}
+
+const componentsToDrawable = (center: Vector2, label: LabelDataPoint) => {
+  const dimensions = { x: 10, y: 10 };
+
+  const x = center.x + label.coordinate.x * center.x - dimensions.x / 2;
+  const y = center.y + label.coordinate.y * center.y - dimensions.y / 2;
+
+  return {
+    name: label.name,
+    position: { x, y },
+    radius: 10
+  };
+};
+
+const predictionsToComponents = (
+  label_components: LabelDataPoint[],
+  predict: PredictResult
+) => {
+  const predictClassesArray = Object.entries(predict.classes);
+
+  const location: Vector2 = { x: 0, y: 0 };
+
+  for (let i = 0; i < label_components.length; i++) {
+    const label = label_components[i];
+    const [_, sameness] = predictClassesArray.find(
+      ([l, _]) => label.name === l
+    )!;
+    location.x += label.coordinate.x * sameness;
+    location.y += label.coordinate.y * sameness;
+  }
+
+  return {
+    name: predict.file_path,
+    coordinate: location
+  };
+};
+
+export const draw_point = (ctx: CanvasRenderingContext2D, color: string) => (
+  point: Drawable
+) => {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.ellipse(
+    point.position.x,
+    point.position.y,
+    point.radius,
+    point.radius,
+    0,
+    0,
+    2 * Math.PI
+  );
+  ctx.closePath();
+  ctx.fill();
+};
+
+const getMousePosition = (canvas: HTMLCanvasElement, event: MouseEvent) => {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
+};
+
+const isIntersect = (drawable: Drawable, mouse: Vector2) => {
+  return (
+    Math.sqrt(
+      (mouse.x - drawable.position.x) ** 2 +
+        (mouse.y - drawable.position.y) ** 2
+    ) < drawable.radius
+  );
+};
+
+export const Plot: React.FC<PlotProps> = ({ files, width, height }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const main = async () => {
-      const margin = { top: 10, right: 30, bottom: 30, left: 60 };
-      const width = 700 - margin.left - margin.right;
-      const height = 700 - margin.top - margin.bottom;
-
-      // append the svg object to the body of the page
-      const svg = d3
-        .select(ref.current)
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      const x = d3
-        .scaleLinear()
-        .domain([-1, 1])
-        .range([0, width]);
-
-      svg
-        .append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-
-      // Add Y axis
-      const y = d3
-        .scaleLinear()
-        .domain([-1, 1])
-        .range([height, 0]);
-
-      svg.append("g").call(d3.axisLeft(y));
-
-      // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
-      // Its opacity is set to 0: we don't see it by default.
-      const tooltip = d3
-        .select(ref.current)
-        .append("div")
-        .style("opacity", 0)
-        .attr("class", "tooltip")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "1px")
-        .style("border-radius", "5px")
-        .style("padding", "10px");
-
-      const mouseover: d3.ValueFn<SVGCircleElement, any, void> = function(
-        d: any
-      ) {
-        tooltip.style("opacity", 1);
-
-        const context = new AudioContext();
-
-        window
-          .fetch(d.file_path)
-          .then(response => response.arrayBuffer())
-          .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
-          .then(audioBuffer => {
-            const source = context.createBufferSource();
-            source.buffer = audioBuffer;
-            source.connect(context.destination);
-            source.start();
-          });
-      };
-
-      const mousemove: d3.ValueFn<SVGCircleElement, any, void> = function(
-        d: any
-      ) {
-        tooltip
-          .html(d.summary)
-          .style("left", d3.mouse(this)[0] + 90 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-          .style("top", d3.mouse(this)[1] + "px");
-      };
-
-      // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
-      const mouseleave: d3.ValueFn<SVGCircleElement, any, void> = function(
-        d: any
-      ) {
-        tooltip
-          .transition()
-          .duration(200)
-          .style("opacity", 0);
-      };
-
-      console.log("hello")
-
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    (async () => {
+      const canvas_center = { x: width / 2, y: height / 2 };
       const labels = await getLabels();
+      const components = getComponents(labels);
 
-      console.log("ik blijf niet hangen")
+      const label_drawables = components.map(l =>
+        componentsToDrawable(canvas_center, l)
+      );
 
-      interface LabelDataPoint {
-        coordinate: Vector2;
-        name: string;
-      }
+      console.log(files);
 
-      const offset = (Math.PI * 2) / labels.length;
-      const radius = 1.0;
-      const center: Vector2 = { x: 0, y: 0 };
-      const label_coordinates: LabelDataPoint[] = [];
+      const prediction_drawables = files
+        .map(prediction => predictionsToComponents(components, prediction))
+        .map(label => componentsToDrawable(canvas_center, label));
 
-      for (let i = 0; i < labels.length; i++) {
-        const label = labels[i];
-        const angle = i * offset;
-        const x = center.x + radius * Math.cos(angle);
-        const y = center.y + radius * Math.sin(angle);
-        label_coordinates.push({
-          coordinate: { x, y },
-          name: label
-        });
-      }
+      label_drawables.forEach(draw_point(ctx, "#FF0000"));
+      prediction_drawables.forEach(draw_point(ctx, "#00FF00"));
 
-      console.log(label_coordinates);
-
-      const div = d3
-        .select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
-      svg
-        .selectAll(".label.dot")
-        .data(label_coordinates)
-        .enter()
-        .append("circle")
-        .attr("class", "label dot")
-        .attr("cx", data => console.log("doing stuff") as any || x(data.coordinate.x))
-        .attr("cy", data => y(data.coordinate.y))
-        .attr("r", 7)
-        .style("fill", "#34eb3d")
-        .style("stroke", "white")
-        .on("mouseover", function(d) {
-          div
-            .transition()
-            .duration(200)
-            .style("opacity", 0.9);
-          div
-            .html(d.name)
-            .style("left", d3.event.pageX + "px")
-            .style("top", d3.event.pageY - 28 + "px");
-        })
-        .on("mouseout", function(d) {
-          div
-            .transition()
-            .duration(500)
-            .style("opacity", 0);
-        });
-
-      // const predictResult = await predict();
-
-      const data = files.map(({classes, file_name}) => {
-        const predictClassesArray = Object.entries(classes);
-
-        const location: Vector2 = { x: 0, y: 0 };
-  
-        for (let i = 0; i < label_coordinates.length; i++) {
-          const label = label_coordinates[i];
-          const [_, sameness] = predictClassesArray.find(
-            ([l, _]) => label.name === l
-          )!;
-          location.x += label.coordinate.x * sameness;
-          location.y += label.coordinate.y * sameness;
+      canvas.addEventListener("mousemove", event => {
+        const mousePosition = getMousePosition(canvas, event);
+        const hit = prediction_drawables
+          .filter(drawable => isIntersect(drawable, mousePosition))
+          .pop();
+        if (hit) {
+          console.log(`Found hit: ${hit.name}`);
         }
+      });
+    })();
+  }, [files]);
 
-        return {
-          location,
-          file_name
-        }
-      })
-
-
-      svg
-        .append("g")
-        .selectAll("dot")
-        //.data(data.filter(function(d: any, i: any){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("cx", d => x(d.location.x))
-        .attr("cy", d => y(d.location.y))
-        .attr("r", 7)
-        .style("fill", "#69b3a2")
-        .style("opacity", 0.3)
-        .style("stroke", "white")
-        .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
-        .on("mouseleave", mouseleave);
-    };
-    main();
-  }, []);
-
-  return <div ref={ref}></div>;
+  return <canvas ref={canvasRef} width={width} height={height} />;
 };

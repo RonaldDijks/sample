@@ -1,21 +1,22 @@
 import * as d3 from "d3";
 
-import electron from 'electron'
+import electron from "electron";
 import { spawn } from "child_process";
 import split from "split2";
-import { getLabels, predict } from './core/backend'
+import { getLabels, predict } from "./core/backend";
 
 interface Vector2 {
   x: number;
   y: number;
 }
 
-const openFolderButton = document.getElementById('open-folder')! as HTMLButtonElement
+const openFolderButton = document.getElementById(
+  "open-folder"
+)! as HTMLButtonElement;
 
 openFolderButton.onclick = async () => {
-  const files = await electron.ipcRenderer.invoke('open-folder')
-}
-
+  const files = await electron.ipcRenderer.invoke("open-folder");
+};
 
 const main = async () => {
   const margin = { top: 10, right: 30, bottom: 30, left: 60 };
@@ -38,7 +39,7 @@ const main = async () => {
     .scaleLinear()
     .domain([-1, 1])
     .range([0, width]);
-    
+
   svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
@@ -105,97 +106,103 @@ const main = async () => {
       .style("opacity", 0);
   };
 
-  const labels = await getLabels()
+  const labels = await getLabels();
 
   interface LabelDataPoint {
     coordinate: Vector2;
     name: string;
   }
 
-  const offset = Math.PI * 2 / labels.length;
+  const offset = (Math.PI * 2) / labels.length;
   const radius = 1.0;
-  const center: Vector2 = {x: 0, y: 0}
+  const center: Vector2 = { x: 0, y: 0 };
   const label_coordinates: LabelDataPoint[] = [];
-  
+
   for (let i = 0; i < labels.length; i++) {
     const label = labels[i];
     const angle = i * offset;
     const x = center.x + radius * Math.cos(angle);
     const y = center.y + radius * Math.sin(angle);
     label_coordinates.push({
-      coordinate: {x, y},
+      coordinate: { x, y },
       name: label
-    })
+    });
   }
 
-  console.log(label_coordinates)
+  console.log(label_coordinates);
 
-  const div = d3.select("body").append("div")	
-    .attr("class", "tooltip")				
+  const div = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
     .style("opacity", 0);
 
   svg
-    .selectAll('.label.dot')
+    .selectAll(".label.dot")
     .data(label_coordinates)
     .enter()
-    .append('circle')
+    .append("circle")
     .attr("class", "label dot")
-    .attr('cx', data => x(data.coordinate.x))
-    .attr('cy', data => y(data.coordinate.y))
-    .attr('r', 7)
+    .attr("cx", data => x(data.coordinate.x))
+    .attr("cy", data => y(data.coordinate.y))
+    .attr("r", 7)
     .style("fill", "#34eb3d")
     .style("stroke", "white")
-    .on("mouseover", function(d) {		
-      div.transition()		
-          .duration(200)		
-          .style("opacity", .9);		
-      div	.html(d.name)	
-          .style("left", (d3.event.pageX) + "px")		
-          .style("top", (d3.event.pageY - 28) + "px");	
-      })					
-  .on("mouseout", function(d) {		
-      div.transition()		
-          .duration(500)		
-          .style("opacity", 0);	
-  });
-
+    .on("mouseover", function(d) {
+      div
+        .transition()
+        .duration(200)
+        .style("opacity", 0.9);
+      div
+        .html(d.name)
+        .style("left", d3.event.pageX + "px")
+        .style("top", d3.event.pageY - 28 + "px");
+    })
+    .on("mouseout", function(d) {
+      div
+        .transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
 
   const predictResult = await predict();
   const predictClassesArray = Object.entries(predictResult.classes);
 
-  const location: Vector2 = { x: 0, y: 0 }
+  const location: Vector2 = { x: 0, y: 0 };
 
   for (let i = 0; i < label_coordinates.length; i++) {
     const label = label_coordinates[i];
-    const [_, sameness] = predictClassesArray.find(([l, _]) => label.name === l)!
+    const [_, sameness] = predictClassesArray.find(
+      ([l, _]) => label.name === l
+    )!;
     location.x += label.coordinate.x * sameness;
     location.y += label.coordinate.y * sameness;
   }
 
-  console.log(location)
+  console.log(location);
 
-    svg
-      .append("g")
-      .selectAll("dot")
-      //.data(data.filter(function(d: any, i: any){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
-      .data([{
-        file_name: predictResult.file_name,
-        location: location,
+  svg
+    .append("g")
+    .selectAll("dot")
+    //.data(data.filter(function(d: any, i: any){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
+    .data([
+      {
+        file_name: predictResult.file_path,
+        location: location
         // summary: labelsArray.map(([label, sameness]) => `${label}: ${sameness}`).join("\n")
-      }])
-      .enter()
-      .append("circle")
-      .attr("cx", d => x(d.location.x))
-      .attr("cy", d => y(d.location.y))
-      .attr("r", 7)
-      .style("fill", "#69b3a2")
-      .style("opacity", 0.3)
-      .style("stroke", "white")
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave);
-
-  
+      }
+    ])
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.location.x))
+    .attr("cy", d => y(d.location.y))
+    .attr("r", 7)
+    .style("fill", "#69b3a2")
+    .style("opacity", 0.3)
+    .style("stroke", "white")
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave);
 
   // const result = spawn("python", [
   //   "..\\app\\backend\\main.py",
@@ -227,4 +234,4 @@ const main = async () => {
   // });
 };
 
-main()
+main();

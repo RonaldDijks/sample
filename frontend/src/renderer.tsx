@@ -9,22 +9,22 @@ import { predict } from "./core/backend";
 const App = () => {
   const [files, setFiles] = useState<PredictResult[]>([]);
 
-  useEffect(() => {
-    const initialize = async () => {
-      const prediction = await predict();
-      setFiles(files => [...files, prediction]);
-    };
-    initialize();
-  });
+  // useEffect(() => {
+  //   const initialize = async () => {
+  //     const prediction = await predict();
+  //     setFiles(files => [...files, prediction]);
+  //   };
+  //   initialize();
+  // });
 
   const addFolder = async () => {
     const result = await electron.ipcRenderer.invoke("open-folder");
-    setFiles(files => [...files, result]);
+    setFiles(files => [...files, ...result]);
   };
 
   return (
     <div>
-      <Plot files={files} />
+      <Plot files={files} width={600} height={600} />
       <button onClick={addFolder}>Load Folder</button>
     </div>
   );
