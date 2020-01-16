@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
-import { predict_folder } from "./core/backend";
+import { predictFolder } from "./core/backend";
 
 let window: BrowserWindow | null;
 
@@ -37,19 +37,22 @@ app.on("activate", () => {
 
 app.on("ready", createWindow);
 
-const first = <T>(array: T[]) => {
+const first = <T>(array: T[]): T | undefined => {
   if (typeof array[0] === "undefined") return undefined;
   return array[0];
 };
 
 ipcMain.handle("open-folder", async () => {
-  const folder = await dialog.showOpenDialog(window!, {
+  if (!window) {
+    throw new Error("Window was undefined.");
+  }
+  const folder = await dialog.showOpenDialog(window, {
     properties: ["openDirectory"]
   });
-  const folder_path = first(folder.filePaths);
-  if (!folder_path) {
+  const folderPath = first(folder.filePaths);
+  if (!folderPath) {
     throw new Error("File path was empty.");
   }
-  const predictions = await predict_folder(folder_path);
-  return predictions
+  const predictions = await predictFolder(folderPath);
+  return predictions;
 });

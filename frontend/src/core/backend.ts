@@ -4,30 +4,32 @@ import * as path from "path";
 
 import { PredictResult } from "./types";
 
-const backend_folder = path.join("..", "app", "backend");
-const backend_root = path.join(backend_folder, "main.py");
+const backendFolder = path.join("..", "app", "backend");
+const backendRoot = path.join(backendFolder, "main.py");
 
-export const getLabels = () =>
-  new Promise<string[]>((resolve, reject) => {
-    const process = spawn("python", [backend_root, "labels"]);
+export const getLabels = (): Promise<string[]> =>
+  new Promise<string[]>(resolve => {
+    const process = spawn("python", [backendRoot, "labels"]);
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
   });
 
 export const predict = (
-  filepath: string = path.join(backend_folder, "kick.wav")
-) =>
-  new Promise<PredictResult>((resolve, reject) => {
-    const process = spawn("python", [backend_root, "predict", filepath]);
+  filepath: string = path.join(backendFolder, "kick.wav")
+): Promise<PredictResult> =>
+  new Promise<PredictResult>(resolve => {
+    const process = spawn("python", [backendRoot, "predict", filepath]);
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
   });
 
-export const predict_folder = (folder: string = backend_folder) =>
-  new Promise<PredictResult[]>((resolve, reject) => {
-    const process = spawn("python", [backend_root, "predict_folder", folder]);
+export const predictFolder = (
+  folder: string = backendFolder
+): Promise<PredictResult[]> =>
+  new Promise<PredictResult[]>(resolve => {
+    const process = spawn("python", [backendRoot, "predict_folder", folder]);
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
