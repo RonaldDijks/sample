@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
 import electron from "electron";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 
 import { Plot } from "./components/Plot";
 import { PredictResult } from "./core/types";
-import { predict } from "./core/backend";
 
-const App = () => {
+const App: React.FC = () => {
   const [files, setFiles] = useState<PredictResult[]>([]);
 
-  // useEffect(() => {
-  //   const initialize = async () => {
-  //     const prediction = await predict();
-  //     setFiles(files => [...files, prediction]);
-  //   };
-  //   initialize();
-  // });
-
-  const addFolder = async () => {
+  const addFolder = async (): Promise<void> => {
     const result = await electron.ipcRenderer.invoke("open-folder");
     setFiles(files => [...files, ...result]);
   };
@@ -29,5 +20,5 @@ const App = () => {
     </div>
   );
 };
-// result
+
 ReactDOM.render(<App />, document.getElementById("root"));

@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
+
 import { predictFolder } from "./core/backend";
 
 let window: BrowserWindow | null;

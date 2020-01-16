@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useRef, useEffect } from "react";
 import { PredictResult } from "../../core/types";
 import { getLabels } from "../../core/backend";
@@ -80,7 +81,7 @@ const predictionsToComponents = (
   }
 
   return {
-    name: predict.file_path,
+    name: predict.filePath,
     coordinate: location
   };
 };
