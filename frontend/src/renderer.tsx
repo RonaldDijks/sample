@@ -9,9 +9,11 @@ import palette from "./core/palette";
 import { Info } from "./components/Info";
 import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
 
+type LabelState = { type: "loading" } | { type: "loaded"; labels: Label[] };
+
 const App: React.FC = () => {
   const [files, setFiles] = useState<Sample[]>([]);
-  const [labels, setLabels] = useState<Label[]>([]);
+  const [labels, setLabels] = useState<LabelState>({ type: "loading" });
   const [hover, setHover] = useState<Sample | undefined>(undefined);
   const { width, height } = useWindowDimensions();
 
@@ -27,7 +29,7 @@ const App: React.FC = () => {
           }
         );
       })
-      .then(setLabels);
+      .then(labels => setLabels({ type: "loaded", labels }));
   }, []);
 
   const addFolder = async (): Promise<void> => {
@@ -36,10 +38,12 @@ const App: React.FC = () => {
     );
     const samples: Sample[] = result.map(
       (x): Sample => {
+        if (labels.type === "loading")
+          throw new Error("Labels not yet loaded.");
         const labelClass = Object.entries(x.classes).reduce((s, x) =>
           s[1] > x[1] ? s : x
         )[0];
-        const label = labels.find(label => label.name == labelClass);
+        const label = labels.labels.find(label => label.name == labelClass);
         if (!label) throw new Error(`Cannot find label: ${labelClass}`);
         return {
           filePath: x.file_path,
@@ -60,11 +64,15 @@ const App: React.FC = () => {
     }
   };
 
+  if (labels.type === "loading") {
+    return <div>Loading</div>;
+  }
+
   return (
     <div>
       <Plot
         files={files}
-        labels={labels}
+        labels={labels.labels}
         nodeSize={20}
         width={width - 2}
         height={height - 200 - 2}
