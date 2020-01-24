@@ -16,7 +16,8 @@ export const Plot: React.FC<PlotProps> = ({
   width,
   height,
   files,
-  onHover
+  onHover,
+  nodeSize
 }) => {
   const scaled = files.map(file => ({
     ...file,
@@ -26,8 +27,6 @@ export const Plot: React.FC<PlotProps> = ({
     }
   }));
 
-  console.log(scaled);
-
   const maxPos = {
     x: scaled
       .map(x => x.position.frequency)
@@ -36,17 +35,24 @@ export const Plot: React.FC<PlotProps> = ({
       .map(x => x.position.length)
       .reduce((s, x) => (s > x ? s : x), Number.NEGATIVE_INFINITY)
   };
+
   return (
-    <div style={{ width, height, border: "1px solid black" }}>
+    <div
+      style={{
+        width,
+        height,
+        border: `1px solid black`
+      }}
+    >
       {scaled.map(sample => (
         <Node
           id={sample.filePath}
           key={sample.filePath}
-          size={20}
+          size={nodeSize}
           color={sample.label.color}
           position={{
-            x: (sample.position.frequency / maxPos.x) * width,
-            y: (sample.position.length / maxPos.y) * height
+            x: (sample.position.frequency / maxPos.x) * (width - nodeSize),
+            y: (sample.position.length / maxPos.y) * (height - nodeSize)
           }}
           onHover={onHover}
         />

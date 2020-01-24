@@ -7,11 +7,13 @@ import { Label, Sample, PredictResult } from "./core/types";
 import { getLabels } from "./core/backend";
 import palette from "./core/palette";
 import { Info } from "./components/Info";
+import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
 
 const App: React.FC = () => {
   const [files, setFiles] = useState<Sample[]>([]);
-  const [hover, setHover] = useState<Sample | undefined>(undefined);
   const [labels, setLabels] = useState<Label[]>([]);
+  const [hover, setHover] = useState<Sample | undefined>(undefined);
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     getLabels()
@@ -46,7 +48,6 @@ const App: React.FC = () => {
         };
       }
     );
-
     setFiles(files => [...files, ...samples]);
   };
 
@@ -65,8 +66,8 @@ const App: React.FC = () => {
         files={files}
         labels={labels}
         nodeSize={20}
-        width={600}
-        height={600}
+        width={width - 2}
+        height={height - 200 - 2}
         onHover={onHover}
       />
       <button onClick={addFolder}>Load Folder</button>
