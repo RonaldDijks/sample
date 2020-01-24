@@ -4,6 +4,7 @@ import numpy as np
 import os
 import sys
 import json
+import glob
 
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
@@ -23,6 +24,7 @@ from feature_extraction import extract_features, get_mfcc
 from model import create_model, train_model
 from librosa.feature import spectral_centroid
 from librosa.util import fix_length
+
 
 import argparse
 
@@ -143,10 +145,8 @@ def predict_many(files):
 
 
 def predict_folder(path):
-    files = os.listdir(path)
-    files = map(lambda x: os.path.join(path, x), files)
-    files = filter(lambda x: x.endswith(".wav"), files)
-    files = list(files)
+    pathname = os.path.join(path, '**/*.wav')
+    files = glob.glob(pathname, recursive=True)
     return predict_many(files)
 
 
