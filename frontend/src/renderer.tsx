@@ -20,7 +20,13 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <Plot files={files} width={600} height={600} onHover={onHover} />
+      <Plot
+        files={files}
+        width={600}
+        height={600}
+        onHover={onHover}
+        nodeSize={20}
+      />
       <button onClick={addFolder}>Load Folder</button>
       {hover}
     </div>
