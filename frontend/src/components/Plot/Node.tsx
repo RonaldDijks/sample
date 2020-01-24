@@ -25,7 +25,7 @@ export const Node: React.FC<NodeProps> = ({
       style={{
         position: "absolute",
         top: position.y,
-        left: position.y,
+        left: position.x,
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: `${size / 2}px`,

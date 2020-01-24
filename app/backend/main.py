@@ -111,12 +111,13 @@ def predict(file):
     predicted_proba_vector = model.predict_proba(prediction_feature)
     predicted_proba = predicted_proba_vector[0]
 
-    fixed_size  = 2 * sr
+    fixed_size  = 44100
 
     centroid = spectral_centroid(y=y, sr=sr)
+    frequency = np.average(centroid)
+
     centroid = fix_length(centroid, size=fixed_size)
 
-    frequency = np.average(centroid)
     length = librosa.get_duration(y=y, sr=sr)
 
     result = {

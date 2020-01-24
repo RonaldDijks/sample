@@ -22,8 +22,8 @@ export const Plot: React.FC<PlotProps> = ({
   const scaled = files.map(file => ({
     ...file,
     position: {
-      frequency: Math.log(file.position.frequency),
-      length: Math.log(file.position.length * 1000)
+      frequency: Math.log10(file.position.frequency),
+      length: Math.log10(file.position.length * 1000)
     }
   }));
 
