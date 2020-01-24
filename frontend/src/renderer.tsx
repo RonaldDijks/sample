@@ -76,6 +76,7 @@ const App: React.FC = () => {
         nodeSize={20}
         width={width - 2}
         height={height - 200 - 2}
+        margin={50}
         onHover={onHover}
       />
       <button onClick={addFolder}>Load Folder</button>

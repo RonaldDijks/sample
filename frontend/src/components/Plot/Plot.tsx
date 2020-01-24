@@ -9,12 +9,28 @@ export interface PlotProps {
   width: number;
   height: number;
   nodeSize: number;
+  margin: number;
   onHover: (id?: string) => void;
 }
+
+const scale = (
+  domainStart: number,
+  domainStop: number,
+  rangeStart: number,
+  rangeStop: number,
+  value: number
+): number => {
+  return (
+    rangeStart +
+    (rangeStop - rangeStart) *
+      ((value - domainStart) / (domainStop - domainStart))
+  );
+};
 
 export const Plot: React.FC<PlotProps> = ({
   width,
   height,
+  margin,
   files,
   onHover,
   nodeSize
@@ -27,7 +43,16 @@ export const Plot: React.FC<PlotProps> = ({
     }
   }));
 
-  const maxPos = {
+  const min = {
+    x: scaled
+      .map(x => x.position.frequency)
+      .reduce((s, x) => (s < x ? s : x), Number.POSITIVE_INFINITY),
+    y: scaled
+      .map(x => x.position.length)
+      .reduce((s, x) => (s < x ? s : x), Number.POSITIVE_INFINITY)
+  };
+
+  const max = {
     x: scaled
       .map(x => x.position.frequency)
       .reduce((s, x) => (s > x ? s : x), Number.NEGATIVE_INFINITY),
@@ -51,8 +76,20 @@ export const Plot: React.FC<PlotProps> = ({
           size={nodeSize}
           color={sample.label.color}
           position={{
-            x: (sample.position.frequency / maxPos.x) * (width - nodeSize),
-            y: (sample.position.length / maxPos.y) * (height - nodeSize)
+            x: scale(
+              min.x,
+              max.x,
+              0 + margin,
+              width - nodeSize - margin,
+              sample.position.frequency
+            ),
+            y: scale(
+              min.y,
+              max.y,
+              0 + margin,
+              height - nodeSize - margin,
+              sample.position.length
+            )
           }}
           onHover={onHover}
         />
