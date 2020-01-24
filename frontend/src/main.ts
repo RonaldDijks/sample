@@ -38,11 +38,6 @@ app.on("activate", () => {
 
 app.on("ready", createWindow);
 
-const first = <T>(array: T[]): T | undefined => {
-  if (typeof array[0] === "undefined") return undefined;
-  return array[0];
-};
-
 ipcMain.handle("open-folder", async () => {
   if (!window) {
     throw new Error("Window was undefined.");
@@ -50,7 +45,7 @@ ipcMain.handle("open-folder", async () => {
   const folder = await dialog.showOpenDialog(window, {
     properties: ["openDirectory"]
   });
-  const folderPath = first(folder.filePaths);
+  const folderPath = folder.filePaths[0];
   if (!folderPath) {
     throw new Error("File path was empty.");
   }

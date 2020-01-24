@@ -1,6 +1,15 @@
 export interface PredictResult {
-  filePath: string;
+  file_path: string;
   classes: {
     [label: string]: number;
   };
+  position: {
+    frequency: number;
+    length: number;
+  };
+}
+
+export interface Vector2 {
+  x: number;
+  y: number;
 }
