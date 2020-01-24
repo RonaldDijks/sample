@@ -13,6 +13,7 @@ export const getLabels = (): Promise<string[]> =>
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
+    process.stderr.on("data", console.error);
   });
 
 export const predict = (
@@ -23,6 +24,7 @@ export const predict = (
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
+    process.stderr.on("data", console.error);
   });
 
 export const predictFolder = (
@@ -33,4 +35,5 @@ export const predictFolder = (
     process.stdout.pipe(split(JSON.parse)).on("data", data => {
       resolve(data);
     });
+    process.stderr.on("data", console.error);
   });
