@@ -18,6 +18,7 @@
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.18.0",
     "html-webpack-plugin": "^3.2.0",
     "prettier": "^1.18.2",
     "ts-loader": "^6.2.1",
@@ -30,6 +31,7 @@
     "d3": "^5.14.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "split2": "^3.1.1"
+    "split2": "^3.1.1",
+    "styled-components": "^5.0.0"
   }
 }

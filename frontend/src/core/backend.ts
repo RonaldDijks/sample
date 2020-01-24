@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
-import split from "split2";
 import * as path from "path";
+import split from "split2";
 
 import { PredictResult } from "./types";
 
