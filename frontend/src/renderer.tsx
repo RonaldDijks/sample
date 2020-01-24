@@ -2,31 +2,61 @@ import electron from "electron";
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
-import { Plot } from "./components/Plot";
-import { PredictResult } from "./core/types";
+import { Plot } from "./components/Plot/Plot";
+import { Label, Sample, PredictResult } from "./core/types";
 import { getLabels } from "./core/backend";
 import palette from "./core/palette";
+import { Info } from "./components/Info";
 
 const App: React.FC = () => {
-  const [files, setFiles] = useState<PredictResult[]>([]);
-  const [hover, setHover] = useState<string | undefined>(undefined);
-  const [labels, setLabels] = useState<string[]>([]);
+  const [files, setFiles] = useState<Sample[]>([]);
+  const [hover, setHover] = useState<Sample | undefined>(undefined);
+  const [labels, setLabels] = useState<Label[]>([]);
 
   useEffect(() => {
-    getLabels().then(setLabels);
+    getLabels()
+      .then(labels => {
+        return labels.map(
+          (name, i): Label => {
+            return {
+              name,
+              color: palette[i]
+            };
+          }
+        );
+      })
+      .then(setLabels);
   }, []);
 
-  const onHover = (id?: string): void => {
-    setHover(() => id);
-  };
-
   const addFolder = async (): Promise<void> => {
-    const result = await electron.ipcRenderer.invoke("open-folder");
-    setFiles(files => [...files, ...result]);
+    const result: PredictResult[] = await electron.ipcRenderer.invoke(
+      "open-folder"
+    );
+    const samples: Sample[] = result.map(
+      (x): Sample => {
+        const labelClass = Object.entries(x.classes).reduce((s, x) =>
+          s[1] > x[1] ? s : x
+        )[0];
+        const label = labels.find(label => label.name == labelClass);
+        if (!label) throw new Error(`Cannot find label: ${labelClass}`);
+        return {
+          filePath: x.file_path,
+          label,
+          position: x.position
+        };
+      }
+    );
+
+    setFiles(files => [...files, ...samples]);
   };
 
-  const getLabelColor = (label: string): string => {
-    return palette[labels.indexOf(label)];
+  const onHover = (id?: string): void => {
+    if (id) {
+      const sample = files.find(f => f.filePath === id);
+      setHover(() => sample);
+    } else {
+      setHover(() => undefined);
+    }
   };
 
   return (
@@ -38,10 +68,9 @@ const App: React.FC = () => {
         width={600}
         height={600}
         onHover={onHover}
-        getLabelColor={getLabelColor}
       />
       <button onClick={addFolder}>Load Folder</button>
-      {hover}
+      <Info selected={hover} />
     </div>
   );
 };

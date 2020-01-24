@@ -1,27 +1,22 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import { PredictResult } from "../../core/types";
+import { Sample, Label } from "../../core/types";
 import { Node } from "./Node";
 
 export interface PlotProps {
-  files: PredictResult[];
-  labels: string[];
+  files: Sample[];
+  labels: Label[];
   width: number;
   height: number;
   nodeSize: number;
-  getLabelColor: (label: string) => string;
   onHover: (id?: string) => void;
 }
-
-const getClass = (file: PredictResult): string =>
-  Object.entries(file.classes).reduce((s, x) => (s[1] > x[1] ? s : x))[0];
 
 export const Plot: React.FC<PlotProps> = ({
   width,
   height,
   files,
-  onHover,
-  getLabelColor
+  onHover
 }) => {
   const scaled = files.map(file => ({
     ...file,
@@ -43,15 +38,15 @@ export const Plot: React.FC<PlotProps> = ({
   };
   return (
     <div style={{ width, height, border: "1px solid black" }}>
-      {scaled.map(file => (
+      {scaled.map(sample => (
         <Node
-          id={file.file_path}
-          key={file.file_path}
+          id={sample.filePath}
+          key={sample.filePath}
           size={20}
-          color={getLabelColor(getClass(file))}
+          color={sample.label.color}
           position={{
-            x: (file.position.frequency / maxPos.x) * width,
-            y: (file.position.length / maxPos.y) * height
+            x: (sample.position.frequency / maxPos.x) * width,
+            y: (sample.position.length / maxPos.y) * height
           }}
           onHover={onHover}
         />
