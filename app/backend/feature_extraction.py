@@ -5,9 +5,8 @@ import librosa
 from pprint import pprint 
 
 
-def get_mfcc(file_name, n_features=40):
-    audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
-    mfccs = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_features)
+def get_mfcc(y, sr, n_features=40):
+    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_features)
     return np.mean(mfccs.T, axis=0)
 
 

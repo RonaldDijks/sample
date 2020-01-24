@@ -1,3 +1,4 @@
+import librosa
 import pandas as pd
 import numpy as np
 import os
@@ -20,6 +21,8 @@ sys.stderr = stderr
 
 from feature_extraction import extract_features, get_mfcc
 from model import create_model, train_model
+from librosa.feature import spectral_centroid
+from librosa.util import fix_length
 
 import argparse
 
@@ -28,6 +31,7 @@ checkpoint_filename = "weights.best.basic_mlp.hdf5"
 model_filename = "model.json"
 model_weights_filename = "model.weights.hdf5"
 encoder_filename = 'classes.npy'
+
 
 def train():
 
@@ -98,14 +102,28 @@ def predict(file):
 
     file_path = os.path.join(os.getcwd(), file)
 
-    prediction_feature = np.array([get_mfcc(file_path)])
+    y, sr = librosa.load(file_path, res_type='kaiser_fast')
+
+    prediction_feature = np.array([get_mfcc(y, sr)])
 
     predicted_proba_vector = model.predict_proba(prediction_feature)
     predicted_proba = predicted_proba_vector[0]
 
+    fixed_size  = 2 * sr
+
+    centroid = spectral_centroid(y=y, sr=sr)
+    centroid = fix_length(centroid, size=fixed_size)
+
+    frequency = np.average(centroid)
+    length = librosa.get_duration(y=y, sr=sr)
+
     result = {
         'file_path': file_path,
-        'classes': {}
+        'classes': {},
+        'position': {
+            'frequency': frequency,
+            'length': length
+        }
     }
 
     for i in range(len(predicted_proba)):
@@ -113,6 +131,7 @@ def predict(file):
         result['classes'][category[0]] = format(predicted_proba[i], '.32f')
 
     return result
+
 
 def predict_many(files):
     output = []
@@ -122,6 +141,7 @@ def predict_many(files):
 
     return output
 
+
 def predict_folder(path):
     files = os.listdir(path)
     files = map(lambda x: os.path.join(path, x), files)
@@ -129,10 +149,12 @@ def predict_folder(path):
     files = list(files)
     return predict_many(files)
 
+
 def labels():
     classes = np.load(os.path.join(outdir, encoder_filename))
     classes_json = json.dumps(classes.tolist())
     print(classes_json)
+
 
 parser = argparse.ArgumentParser()
 
