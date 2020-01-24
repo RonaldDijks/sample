@@ -145,7 +145,7 @@ def predict_many(files):
 
 
 def predict_folder(path):
-    pathname = os.path.join(path, '**/*.wav')
+    pathname = os.path.join(path, '**', '*.wav')
     files = glob.glob(pathname, recursive=True)
     return predict_many(files)
 
