@@ -6,10 +6,17 @@ interface NodeProps {
   position: Vector2;
   id: string;
   size: number;
+  color: string;
   onHover: (id?: string) => void;
 }
 
-export const Node: React.FC<NodeProps> = ({ id, position, size, onHover }) => {
+export const Node: React.FC<NodeProps> = ({
+  id,
+  position,
+  size,
+  color,
+  onHover
+}) => {
   const onMouseEnter = (): void => onHover(id);
   const onMouseLeave = (): void => onHover(undefined);
 
@@ -22,7 +29,7 @@ export const Node: React.FC<NodeProps> = ({ id, position, size, onHover }) => {
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: `${size / 2}px`,
-        background: "red"
+        background: color
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

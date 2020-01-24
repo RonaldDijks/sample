@@ -1,21 +1,27 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React from "react";
 import { PredictResult } from "../../core/types";
 import { Node } from "./Node";
 
 export interface PlotProps {
   files: PredictResult[];
+  labels: string[];
   width: number;
   height: number;
   nodeSize: number;
+  getLabelColor: (label: string) => string;
   onHover: (id?: string) => void;
 }
+
+const getClass = (file: PredictResult): string =>
+  Object.entries(file.classes).reduce((s, x) => (s[1] > x[1] ? s : x))[0];
 
 export const Plot: React.FC<PlotProps> = ({
   width,
   height,
   files,
-  onHover
+  onHover,
+  getLabelColor
 }) => {
   const scaled = files.map(file => ({
     ...file,
@@ -42,6 +48,7 @@ export const Plot: React.FC<PlotProps> = ({
           id={file.file_path}
           key={file.file_path}
           size={20}
+          color={getLabelColor(getClass(file))}
           position={{
             x: (file.position.frequency / maxPos.x) * width,
             y: (file.position.length / maxPos.y) * height
