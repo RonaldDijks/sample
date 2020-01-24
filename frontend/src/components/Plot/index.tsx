@@ -7,6 +7,7 @@ export interface PlotProps {
   files: PredictResult[];
   width: number;
   height: number;
+  nodeSize: number;
   onHover: (id?: string) => void;
 }
 
@@ -40,6 +41,7 @@ export const Plot: React.FC<PlotProps> = ({
         <Node
           id={file.file_path}
           key={file.file_path}
+          size={20}
           position={{
             x: (file.position.frequency / maxPos.x) * width,
             y: (file.position.length / maxPos.y) * height

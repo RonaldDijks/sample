@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable react/prop-types */
 import React from "react";
 import { Vector2 } from "src/core/types";
@@ -8,14 +5,13 @@ import { Vector2 } from "src/core/types";
 interface NodeProps {
   position: Vector2;
   id: string;
+  size: number;
   onHover: (id?: string) => void;
 }
 
-export const Node: React.FC<NodeProps> = ({ id, position, onHover }) => {
-  const size = 20;
-
-  const onMouseEnter = (_: any) => onHover(id);
-  const onMouseLeave = (_: any) => onHover(undefined);
+export const Node: React.FC<NodeProps> = ({ id, position, size, onHover }) => {
+  const onMouseEnter = (): void => onHover(id);
+  const onMouseLeave = (): void => onHover(undefined);
 
   return (
     <div

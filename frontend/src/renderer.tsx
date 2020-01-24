@@ -9,8 +9,8 @@ const App: React.FC = () => {
   const [files, setFiles] = useState<PredictResult[]>([]);
   const [hover, setHover] = useState<string | undefined>(undefined);
 
-  const onHover = (id?: string) => {
-    setHover(_ => id);
+  const onHover = (id?: string): void => {
+    setHover(() => id);
   };
 
   const addFolder = async (): Promise<void> => {
