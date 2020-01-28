@@ -11,6 +11,8 @@ import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
 
 type LabelState = { type: "loading" } | { type: "loaded"; labels: Label[] };
 
+const context = new AudioContext();
+
 const App: React.FC = () => {
   const [files, setFiles] = useState<Sample[]>([]);
   const [labels, setLabels] = useState<LabelState>({ type: "loading" });
@@ -55,6 +57,18 @@ const App: React.FC = () => {
   const onHover = (id?: string): void => {
     if (id) {
       const sample = files.find(f => f.filePath === id);
+
+      window
+        .fetch(id)
+        .then(res => res.arrayBuffer())
+        .then(buff => context.decodeAudioData(buff))
+        .then(buff => {
+          const source = context.createBufferSource();
+          source.buffer = buff;
+          source.connect(context.destination);
+          source.start();
+        });
+
       setHover(() => sample);
     } else {
       setHover(() => undefined);
