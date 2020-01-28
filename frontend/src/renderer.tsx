@@ -36,22 +36,19 @@ const App: React.FC = () => {
     const result: PredictResult[] = await electron.ipcRenderer.invoke(
       "open-folder"
     );
-    const samples: Sample[] = result.map(
-      (x): Sample => {
-        if (labels.type === "loading")
-          throw new Error("Labels not yet loaded.");
-        const labelClass = Object.entries(x.classes).reduce((s, x) =>
-          s[1] > x[1] ? s : x
-        )[0];
-        const label = labels.labels.find(label => label.name == labelClass);
-        if (!label) throw new Error(`Cannot find label: ${labelClass}`);
-        return {
-          filePath: x.file_path,
-          label,
-          position: x.position
-        };
-      }
-    );
+    const samples: Sample[] = result.map(x => {
+      if (labels.type === "loading") throw new Error("Labels not yet loaded.");
+      const labelClass = Object.entries(x.classes).reduce((s, x) =>
+        s[1] > x[1] ? s : x
+      )[0];
+      const label = labels.labels.find(label => label.name == labelClass);
+      if (!label) throw new Error(`Cannot find label: ${labelClass}`);
+      return {
+        filePath: x.file_path,
+        label,
+        position: x.position
+      };
+    });
     setFiles(files => [...files, ...samples]);
   };
 

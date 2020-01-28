@@ -8,6 +8,7 @@
     "start": "yarn build && electron ./dist/main.js"
   },
   "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.0",
     "@types/plotly.js": "^1.44.15",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
@@ -15,6 +16,7 @@
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
     "electron": "^7.1.6",
+    "electron-devtools-installer": "^2.2.4",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",

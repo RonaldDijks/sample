@@ -24,3 +24,5 @@ export const Info: React.FC<InfoProps> = props => {
     </table>
   );
 };
+
+Info.displayName = "Info";

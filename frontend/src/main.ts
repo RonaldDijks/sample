@@ -1,6 +1,8 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
-
 import { predictFolder } from "./core/backend";
+import installExtension, {
+  REACT_DEVELOPER_TOOLS
+} from "electron-devtools-installer";
 
 let window: BrowserWindow | null;
 
@@ -18,6 +20,10 @@ function createWindow(): void {
   if (process.env.ELECTRON_DEV == "dev") {
     window.webContents.openDevTools();
   }
+
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then(name => console.log(`Installed ${name}`))
+    .catch(err => console.error(err));
 
   window.on("closed", () => {
     window = null;

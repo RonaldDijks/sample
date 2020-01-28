@@ -36,3 +36,5 @@ export const Node: React.FC<NodeProps> = ({
     ></div>
   );
 };
+
+Node.displayName = "Node";

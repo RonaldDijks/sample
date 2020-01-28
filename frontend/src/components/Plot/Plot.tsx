@@ -97,3 +97,5 @@ export const Plot: React.FC<PlotProps> = ({
     </div>
   );
 };
+
+Plot.displayName = "Plot";
