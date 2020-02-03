@@ -28,7 +28,8 @@ export const Node: React.FC<NodeProps> = ({
         left: position.x,
         width: `${size}px`,
         height: `${size}px`,
-        borderRadius: `${size / 2}px`,
+        borderRadius: `${size}px`,
+        border: "2px black solid",
         background: color
       }}
       onMouseEnter={onMouseEnter}

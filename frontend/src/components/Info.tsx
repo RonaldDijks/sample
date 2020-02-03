@@ -12,16 +12,18 @@ export const Info: React.FC<InfoProps> = props => {
   const basename = path.basename(props.selected.filePath);
   const label = props.selected.label;
   return (
-    <table>
-      <tr>
-        <td>filename</td>
-        <td>{basename}</td>
-      </tr>
-      <tr>
-        <td>label</td>
-        <td style={{ background: label.color }}>{label.name}</td>
-      </tr>
-    </table>
+    <div style={{ color: "white" }}>
+      <table>
+        <tr>
+          <td>filename</td>
+          <td>{basename}</td>
+        </tr>
+        <tr>
+          <td>label</td>
+          <td style={{ background: label.color }}>{label.name}</td>
+        </tr>
+      </table>
+    </div>
   );
 };
 

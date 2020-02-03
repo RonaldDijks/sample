@@ -8,6 +8,8 @@ import { getLabels } from "./core/backend";
 import palette from "./core/palette";
 import { Info } from "./components/Info";
 import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
+import { Vizualiser } from "./components/Vizualiser/Visualizer";
+import { LabelList } from "./components/LabelList";
 
 type LabelState = { type: "loading" } | { type: "loaded"; labels: Label[] };
 
@@ -19,6 +21,7 @@ const App: React.FC = () => {
   const [hover, setHover] = useState<Sample | undefined>(undefined);
   const { width, height } = useWindowDimensions();
   const [currentSource, setCurrentSource] = useState<AudioBufferSourceNode>();
+  const [samples, setSamples] = useState<Float32Array>();
 
   useEffect(() => {
     getLabels()
@@ -64,10 +67,8 @@ const App: React.FC = () => {
         .then(res => res.arrayBuffer())
         .then(buffer => audioContext.decodeAudioData(buffer))
         .then(buffer => {
-          if (currentSource) {
-            currentSource.stop();
-          }
-
+          if (currentSource) currentSource.stop();
+          setSamples(buffer.getChannelData(0));
           const source = audioContext.createBufferSource();
           source.buffer = buffer;
           source.connect(audioContext.destination);
@@ -93,8 +94,17 @@ const App: React.FC = () => {
         flexWrap: "nowrap"
       }}
     >
-      <div style={{ flex: 1, width: "200px" }}>
-        <button onClick={addFolder}>Load Folder</button>
+      <div
+        style={{
+          flex: 1,
+          width: "200px",
+          textAlign: "center"
+        }}
+      >
+        <div style={{ paddingTop: "20px" }}>
+          <button onClick={addFolder}>Load Folder</button>
+          <LabelList labels={labels.labels} />
+        </div>
       </div>
       <div style={{ flex: 1 }}>
         <Plot
@@ -108,6 +118,14 @@ const App: React.FC = () => {
           x={200}
         />
         <Info selected={hover} />
+        {hover && (
+          <Vizualiser
+            width={width - 2 - 200}
+            height={100}
+            name={(hover && hover.filePath) || ""}
+            data={samples}
+          />
+        )}
       </div>
     </div>
   );
