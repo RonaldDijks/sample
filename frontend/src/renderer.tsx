@@ -68,15 +68,14 @@ const App: React.FC = () => {
         .then(buffer => audioContext.decodeAudioData(buffer))
         .then(buffer => {
           if (currentSource) currentSource.stop();
-          setSamples(buffer.getChannelData(0));
           const source = audioContext.createBufferSource();
           source.buffer = buffer;
           source.connect(audioContext.destination);
           source.start();
-          setCurrentSource(source);
+          setSamples(() => buffer.getChannelData(0));
+          setCurrentSource(() => source);
+          setHover(() => sample);
         });
-
-      setHover(() => sample);
     } else {
       setHover(() => undefined);
     }
@@ -120,7 +119,7 @@ const App: React.FC = () => {
         <Info selected={hover} />
         {hover && (
           <Vizualiser
-            width={width - 2 - 200}
+            width={width - 2 - 200 - 20}
             height={100}
             name={(hover && hover.filePath) || ""}
             data={samples}

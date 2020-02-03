@@ -19,12 +19,22 @@ export const Vizualiser: React.FC<VizualiserProps> = ({
   useEffect(() => {
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    if (data) {
+      const dx = width / data.length;
+      for (let i = 0; i < data.length; i++) {
+        const sample = data[i];
+        ctx.lineTo(i * dx, height * ((sample + 1) / 2));
+      }
+    }
+    ctx.stroke();
+    ctx.closePath();
   }, [name]);
 
   return (
-    <div style={{ border: "2px solid pink" }}>
+    <div>
       <canvas width={width} height={height} ref={ref} />
     </div>
   );
