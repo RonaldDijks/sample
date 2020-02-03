@@ -8,6 +8,7 @@ export interface PlotProps {
   labels: Label[];
   width: number;
   height: number;
+  x: number;
   nodeSize: number;
   margin: number;
   onHover: (id?: string) => void;
@@ -33,7 +34,8 @@ export const Plot: React.FC<PlotProps> = ({
   margin,
   files,
   onHover,
-  nodeSize
+  nodeSize,
+  x
 }) => {
   const scaled = files.map(file => ({
     ...file,
@@ -80,8 +82,8 @@ export const Plot: React.FC<PlotProps> = ({
             x: scale(
               min.x,
               max.x,
-              0 + margin,
-              width - nodeSize - margin,
+              x + margin,
+              x + width - nodeSize - margin,
               sample.position.frequency
             ),
             y: scale(

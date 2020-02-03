@@ -93,7 +93,7 @@ const App: React.FC = () => {
         flexWrap: "nowrap"
       }}
     >
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, width: "200px" }}>
         <button onClick={addFolder}>Load Folder</button>
       </div>
       <div style={{ flex: 1 }}>
@@ -101,12 +101,12 @@ const App: React.FC = () => {
           files={files}
           labels={labels.labels}
           nodeSize={20}
-          width={width - 2}
+          width={width - 2 - 200}
           height={height - 200 - 2}
           margin={50}
           onHover={onHover}
+          x={200}
         />
-
         <Info selected={hover} />
       </div>
     </div>
