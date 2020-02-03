@@ -66,7 +66,8 @@ export const Plot: React.FC<PlotProps> = ({
       style={{
         width,
         height,
-        border: `1px solid black`
+        border: `1px solid black`,
+        background: "#1E2126"
       }}
     >
       {scaled.map(sample => (

@@ -11,13 +11,14 @@ import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
 
 type LabelState = { type: "loading" } | { type: "loaded"; labels: Label[] };
 
-const context = new AudioContext();
+const audioContext = new AudioContext();
 
 const App: React.FC = () => {
   const [files, setFiles] = useState<Sample[]>([]);
   const [labels, setLabels] = useState<LabelState>({ type: "loading" });
   const [hover, setHover] = useState<Sample | undefined>(undefined);
   const { width, height } = useWindowDimensions();
+  const [currentSource, setCurrentSource] = useState<AudioBufferSourceNode>();
 
   useEffect(() => {
     getLabels()
@@ -61,12 +62,17 @@ const App: React.FC = () => {
       window
         .fetch(id)
         .then(res => res.arrayBuffer())
-        .then(buff => context.decodeAudioData(buff))
-        .then(buff => {
-          const source = context.createBufferSource();
-          source.buffer = buff;
-          source.connect(context.destination);
+        .then(buffer => audioContext.decodeAudioData(buffer))
+        .then(buffer => {
+          if (currentSource) {
+            currentSource.stop();
+          }
+
+          const source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioContext.destination);
           source.start();
+          setCurrentSource(source);
         });
 
       setHover(() => sample);
@@ -80,18 +86,29 @@ const App: React.FC = () => {
   }
 
   return (
-    <div>
-      <Plot
-        files={files}
-        labels={labels.labels}
-        nodeSize={20}
-        width={width - 2}
-        height={height - 200 - 2}
-        margin={50}
-        onHover={onHover}
-      />
-      <button onClick={addFolder}>Load Folder</button>
-      <Info selected={hover} />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "nowrap"
+      }}
+    >
+      <div style={{ flex: 1 }}>
+        <button onClick={addFolder}>Load Folder</button>
+      </div>
+      <div style={{ flex: 1 }}>
+        <Plot
+          files={files}
+          labels={labels.labels}
+          nodeSize={20}
+          width={width - 2}
+          height={height - 200 - 2}
+          margin={50}
+          onHover={onHover}
+        />
+
+        <Info selected={hover} />
+      </div>
     </div>
   );
 };
