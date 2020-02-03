@@ -4,7 +4,7 @@ import { Sample } from "src/core/types";
 import * as path from "path";
 
 export interface InfoProps {
-  selected?: Sample;
+  selected?: Sample & { duration: number };
 }
 
 export const Info: React.FC<InfoProps> = props => {
@@ -15,12 +15,18 @@ export const Info: React.FC<InfoProps> = props => {
     <div style={{ color: "white" }}>
       <table>
         <tr>
-          <td>filename</td>
+          <td>Filename:</td>
           <td>{basename}</td>
         </tr>
         <tr>
-          <td>label</td>
-          <td style={{ background: label.color }}>{label.name}</td>
+          <td>Label:</td>
+          <td style={{ background: label.color, color: "black" }}>
+            {label.name}
+          </td>
+        </tr>
+        <tr>
+          <td>Length:</td>
+          <td>{props.selected.duration.toFixed(2)} seconds</td>
         </tr>
       </table>
     </div>

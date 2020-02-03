@@ -1,15 +1,18 @@
 import electron from "electron";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { MoonLoader } from "react-spinners";
 
-import { Plot } from "./components/Plot/Plot";
-import { Label, Sample, PredictResult } from "./core/types";
-import { getLabels } from "./core/backend";
-import palette from "./core/palette";
+import { css } from "@emotion/core";
+
 import { Info } from "./components/Info";
-import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
-import { Vizualiser } from "./components/Vizualiser/Visualizer";
 import { LabelList } from "./components/LabelList";
+import { Plot } from "./components/Plot/Plot";
+import { Vizualiser } from "./components/Vizualiser/Visualizer";
+import { getLabels } from "./core/backend";
+import { useWindowDimensions } from "./core/hooks/useWindowDimensions";
+import palette from "./core/palette";
+import { Label, PredictResult, Sample } from "./core/types";
 
 type LabelState = { type: "loading" } | { type: "loaded"; labels: Label[] };
 
@@ -18,7 +21,9 @@ const audioContext = new AudioContext();
 const App: React.FC = () => {
   const [files, setFiles] = useState<Sample[]>([]);
   const [labels, setLabels] = useState<LabelState>({ type: "loading" });
-  const [hover, setHover] = useState<Sample | undefined>(undefined);
+  const [hover, setHover] = useState<Sample & { duration: number } | undefined>(
+    undefined
+  );
   const { width, height } = useWindowDimensions();
   const [currentSource, setCurrentSource] = useState<AudioBufferSourceNode>();
   const [samples, setSamples] = useState<Float32Array>();
@@ -74,7 +79,7 @@ const App: React.FC = () => {
           source.start();
           setSamples(() => buffer.getChannelData(0));
           setCurrentSource(() => source);
-          setHover(() => sample);
+          setHover(() => sample && { duration: buffer.duration, ...sample });
         });
     } else {
       setHover(() => undefined);
@@ -82,7 +87,15 @@ const App: React.FC = () => {
   };
 
   if (labels.type === "loading") {
-    return <div>Loading</div>;
+    return (
+      <MoonLoader
+        color={"white"}
+        css={css`
+          display: block;
+          margin: 0 auto;
+        `}
+      />
+    );
   }
 
   return (
@@ -100,8 +113,29 @@ const App: React.FC = () => {
           textAlign: "center"
         }}
       >
-        <div style={{ paddingTop: "20px" }}>
-          <button onClick={addFolder}>Load Folder</button>
+        <div
+          style={{
+            paddingTop: "20px",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <button
+            style={{
+              fontSize: "100%",
+              fontFamily: "inherit",
+              padding: 0,
+              margin: "15px",
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              color: "white",
+              background: "none",
+              border: `5px solid white`
+            }}
+            onClick={addFolder}
+          >
+            Load Folder
+          </button>
           <LabelList labels={labels.labels} />
         </div>
       </div>
