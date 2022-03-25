@@ -15,7 +15,7 @@
     "@types/split2": "^2.1.6",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
-    "electron": "^7.1.6",
+    "electron": "^13.6.6",
     "electron-devtools-installer": "^2.2.4",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
